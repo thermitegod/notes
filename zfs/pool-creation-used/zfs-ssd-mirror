@@ -1,0 +1,5 @@
+zpool create -o ashift=12 -O atime=off -O compression=lz4 -m none ssd-mirror mirror /dev/disk/by-id/wwn-0x5002538da007852e /dev/disk/by-id/wwn-0x5002538d417e53d6
+
+zfs create -o mountpoint=/mnt/kvm ssd-mirror/KVM
+zfs create -o mountpoint=/mnt/music ssd-mirror/MUSIC
+

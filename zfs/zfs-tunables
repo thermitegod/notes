@@ -1,0 +1,18 @@
+#root pools
+http://www.funtoo.org/ZFS_Install_Guide
+http://www.thecrosseroads.net/2016/02/booting-a-zfs-root-via-uefi-on-debian/
+https://guyrobottv.wordpress.com/2017/04/18/installing-gentoo-linux-on-zfs-with-nvme-drive-part-1/
+https://guyrobottv.wordpress.com/2017/04/25/installing-gentoo-linux-on-zfs-with-nvme-drive-part-2/
+
+###
+zfs set mountpoint=<dir> <pool>
+zfs set atime=off <pool>
+zfs set compression=lz4 <pool>
+zfs set xattr=sa <pool>
+
+zfs set autoexpand=on <pool>
+zfs set autoreplace=on <pool>
+
+#rename pool
+zpool export <old pool>
+zpool import <old pool> <new pool>

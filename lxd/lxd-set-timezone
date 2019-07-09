@@ -1,0 +1,9 @@
+https://blog.simos.info/how-to-set-the-timezone-in-lxd-containers/
+
+lxc profile set default environment.TZ America/Phoenix
+
+#test
+exec mycontainer -- date
+
+
+

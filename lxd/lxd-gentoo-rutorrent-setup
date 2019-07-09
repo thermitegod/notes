@@ -1,0 +1,2 @@
+webapp-config -s lighttpd -h localhost -d rutorrent -I rutorrent 3.8-r1
+chown -R brandon /var/www/localhost/htdocs/rutorrent

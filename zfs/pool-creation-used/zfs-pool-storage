@@ -1,0 +1,4 @@
+zpool create -f -O normalization=formD -O atime=off -o ashift=12 -O checksum=skein -O compression=lz4 -m none storage raidz2 /dev/disk/by-id/wwn-0x7001770231855206400x /dev/disk/by-id/wwn-0x6667096484546236416x /dev/disk/by-id/wwn-0x6674133358964002816x /dev/disk/by-id/wwn-0x15338777562753159168x /dev/disk/by-id/wwn-0x1668963248178745345x raidz2 /dev/disk/by-id/wwn-0x1153208487055347713x /dev/disk/by-id/wwn-0x6995859257344282624x /dev/disk/by-id/wwn-0x5337127219588386816x /dev/disk/by-id/wwn-0x6993888932507308032x /dev/disk/by-id/wwn-0x13633246000157446145x
+
+zfs create -o mountpoint=/mnt/anime storage/anime
+zfs create -o mountpoint=/mnt/data storage/data

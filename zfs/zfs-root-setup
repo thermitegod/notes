@@ -1,0 +1,69 @@
+https://wiki.gentoo.org/wiki/User:Fearedbliss/Installing_Gentoo_Linux_On_ZFS
+
+
+###partition setup###
+
+#parted
+mklabel gpt
+unit mib
+
+mkpart primary 1 101
+mkpart primary 101 601
+mkpart primary 601 -1
+name 1 esp
+name 2 boot
+name 3 rootfs
+set 1 boot on
+
+#same partition scheme for both drives
+#set boot for only one drive
+#dont mirror boot pool
+
+###format###
+
+mkfs.fat -F32 /dev/nvme0n1p1
+
+zpool create -f -o ashift=12 -O normalization=formD -o cachefile= -O atime=off -O compression=lz4 -m none -R /mnt/gentoo zroot mirror /dev/nvme0n1p3 /dev/nvme1n1p3
+
+zfs create zroot/ROOT
+zfs create zroot/HOME
+zfs create zroot/LXD
+
+zfs create -o mountpoint=/ zroot/ROOT/gentoo
+zfs create zroot/ROOT/gentoo/var
+zfs create zroot/ROOT/gentoo/var/log
+
+zfs create -o mountpoint=/home/brandon zroot/HOME/brandon
+zfs create -o mountpoint=/home/sandbox zroot/HOME/sandbox
+zfs create -o mountpoint=/root zroot/HOME/root
+
+#other datasets
+zfs create -o mountpoint=/var/db/repos zroot/ROOT/repos
+
+#zfs legacy mounts
+#dist is mounted on tmpfs, which is only mounted after init runs zfs-import, this fixes the problem
+zfs set mountpoint=legacy zroot/ROOT/distfiles
+zroot/ROOT/distfiles	/var/cache/distfiles	zfs	defaults,noauto		1 2 #fstab
+
+
+###boot###
+
+zpool create -f -d -o ashift=12 -o cachefile= -m /boot -R /mnt/gentoo boot /dev/nvme0n1p2
+#use blikd to setup fstab for boot
+mount /boot/efi
+
+
+###install/copy existing root###
+
+#copy existing root pool from snapshot
+#have to export pool too send/recv
+
+zpool export zroot
+
+zfs send rpool/ROOT/gentoo@tmp | zfs recv -F zroot/ROOT/gentoo
+
+zpool import zroot -R /mnt/gentoo
+
+#chroot into new install & use $grub2-install-efi-fucked to reinstall grub to efi
+##check w/ efibootmgr
+

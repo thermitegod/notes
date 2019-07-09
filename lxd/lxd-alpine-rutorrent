@@ -1,0 +1,77 @@
+#$commands
+#https://blog.simos.info/how-to-run-graphics-accelerated-gui-apps-in-lxd-containers-on-your-ubuntu-desktop/
+#https://wiki.alpinelinux.org/wiki/Install_Alpine_on_LXD
+lxc launch images:alpine/edge alpine
+
+lxc stop alpine
+
+lxc config device add alpine eth0 nic name=eth0 nictype=bridged parent=br0
+lxc config set alpine security.privileged true
+lxc config set alpine limits.cpu 8
+lxc config set alpine limits.memory 8192MB
+
+lxc start alpine;lxc exec alpine ash
+
+sed -i 's/^tty/# tty/g' /etc/inittab
+rm /var/log/messages
+
+setup-alpine
+
+#switch too edge
+setup-apkrepos
+
+#apk --no-cache update;apk --no-cache upgrade
+apk update;apk upgrade
+
+#basic tools
+apk --no-cache add htop shadow tmux grep
+
+##rtorrent##
+
+#req
+apk add rtorrent mktorrent lighttpd rutorrent c-ares
+
+#php & extensions
+apk add php7 php-fpm php7-cgi php7-xmlrpc php7-json
+
+#dnsmasq
+apk add dnsmasq
+
+#dns user
+groupadd -r dnsmasq
+useradd -r -g dnsmasq dnsmasq
+
+#write too file
+/etc/dnsmasq.conf
+
+listen-address=127.0.0.1
+port=53
+bind-interfaces
+user=dnsmasq
+group=dnsmasq
+pid-file=/var/run/dnsmasq.pid
+domain-needed
+bogus-priv
+no-hosts
+dns-forward-max=10000
+cache-size=1000
+neg-ttl=3600
+
+#rc
+rc-update add dnsmasq
+rc-update add php-fpm7
+rc-update add lighttpd
+
+#user
+adduser -D -s /bin/ash -h /home/brandon brandon
+su - brandon
+cd ~
+mkdir -p .config/rtorrent rtorrent/data rtorrent/share rtorrent/session
+^D
+
+chown -R brandon:brandon /usr/share/webapps/rutorrent
+
+##transmission##
+
+apk --no-cache add transmission-cli transmission-daemon
+

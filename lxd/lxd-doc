@@ -1,0 +1,22 @@
+#create
+lxc launch images:gentoo/current/amd64 gentoo0
+
+#add networking #need vswitch
+lxc config device add gentoo0 eth0 nic name=eth0 nictype=bridged parent=br0
+
+#security priv
+lxc config set gentoo0 security.privileged true
+
+#gentoo portage setup
+lxc config device add gentoo0 repos disk source=/var/db/repos path=/var/db/repos
+lxc config device add gentoo0 distfiles disk source=/var/cache/distfiles path=/var/cache/distfiles
+lxc config device add gentoo0 packages disk source=/var/cache/packages path=/var/cache/packages
+
+#remove device
+lxc config device remove gentoo0 repos
+
+#limits
+#https://stgraber.org/2016/03/26/lxd-2-0-resource-control-412/
+lxc config set gentoo0 limits.cpu 8
+lxc config set gentoo0 limits.memory 8192MB
+

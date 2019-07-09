@@ -1,0 +1,4 @@
+#opengl in qemu
+usermod -a -G video qemu
+
+
