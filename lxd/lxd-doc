@@ -20,3 +20,9 @@ lxc config device remove gentoo0 repos
 lxc config set gentoo0 limits.cpu 8
 lxc config set gentoo0 limits.memory 8192MB
 
+#set init
+#still testing
+#sys-apps/openrc[sysv-utils]
+#https://wiki.gentoo.org/wiki/OpenRC/openrc-init
+lxc config set gentoo0 raw.lxc 'lxc.init.cmd = /sbin/openrc-init'
+
