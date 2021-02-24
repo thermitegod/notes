@@ -94,9 +94,12 @@ NULL
 
 ###boot pool###
 
-#==MUST== be and remain featureless to work with grub
-zpool create -f -d -o ashift=12 -o cachefile= -m /boot -R /mnt/gentoo boot /dev/nvme0n1p2
-#use blkid to setup fstab for boot
+# need to set compatibility to grub2 or legacy, this ensures that the pool can be read by grub
+zpool create -f -d -o ashift=12 -O atime=off -o compatibility=grub2 -o cachefile= -m /boot -R /mnt/gentoo boot /dev/nvme0n1p2
+# or for existing boot pools
+zpool set compatibility=grub2 boot
+
+#use blkid to setup fstab for /boot/efi
 PARTUUID=<ID>	/boot/efi	vfat	rw,nodev,nosuid,noexec,relatime,noauto,umask=0022	1 2 #fstab
 
 mount /boot/efi
