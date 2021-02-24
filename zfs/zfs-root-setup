@@ -41,22 +41,56 @@ zfs create zroot/LXD
 #system
 zfs create -o mountpoint=/ zroot/ROOT/gentoo
 zfs create zroot/ROOT/gentoo/var
+zfs create zroot/ROOT/gentoo/var/db
+zfs create zroot/ROOT/gentoo/var/db/repos
+zfs create zroot/ROOT/gentoo/var/db/pkg
+zfs create zroot/ROOT/gentoo/var/spool
+zfs create zroot/ROOT/gentoo/var/lib
+zfs create zroot/ROOT/gentoo/var/log
+zfs create zroot/ROOT/gentoo/var/distfiles
 
 #users
 zfs create -o mountpoint=/home/brandon zroot/HOME/brandon
 zfs create -o mountpoint=/root zroot/HOME/root
 
+#quotas
+zfs set quota=50M    zroot/HOME/root
+
+zfs set quota=10M    zroot/ROOT/gentoo/var
+zfs set quota=1M     zroot/ROOT/gentoo/var/empty
+zfs set quota=500M   zroot/ROOT/gentoo/var/lib
+zfs set quota=50M    zroot/ROOT/gentoo/var/log
+zfs set quota=50M    zroot/ROOT/gentoo/var/spool
+zfs set quota=10M    zroot/ROOT/gentoo/var/db
+zfs set quota=200M   zroot/ROOT/gentoo/var/db/pkg
+zfs set quota=2G     zroot/ROOT/gentoo/var/db/repos
+zfs set quota=10G    zroot/ROOT/gentoo/var/distfiles
+
+#disable snapshots
+zfs set com.sun:auto-snapshot=false zroot/ROOT/gentoo/var
+zfs set com.sun:auto-snapshot=false zroot/ROOT/gentoo/var/empty
+zfs set com.sun:auto-snapshot=false zroot/ROOT/gentoo/var/log
+zfs set com.sun:auto-snapshot=false zroot/ROOT/gentoo/var/distfiles
+zfs set com.sun:auto-snapshot=false zroot/ROOT/gentoo/var/spool
+zfs set com.sun:auto-snapshot=false zroot/ROOT/gentoo/var/db
+zfs set com.sun:auto-snapshot=false zroot/ROOT/gentoo/var/db/repos
+
+zfs set com.sun:auto-snapshot=true zroot/ROOT/gentoo/var/db/pkg
+
+#other - set for all pools but boot
+zfs set atime=off zroot
+zfs set checksum=fletcher4 zroot
+zfs set dnodesize=auto zroot
+zfs set xattr=sa zroot
+zfs set acltype=posixacl zroot
+
+#noexec pools, same for storage pools
+zfs set exec=off zroot/ROOT/gentoo/var
+zfs set exec=off zroot/CACHE
+
 #other datasets
-#needed to do this way because /var/db is not a dataset
-zfs create -o mountpoint=/var/db/repos zroot/ROOT/repos
-zfs create -o mountpoint=/var/db/pkg zroot/ROOT/pkg
-zfs create -o mountpoint=/var/cache/distfiles zroot/ROOT/distfiles
 
-#zfs legacy mounts
-#dist is mounted on tmpfs, which is only mounted after init runs zfs-import, this fixes the problem
-zfs set mountpoint=legacy zroot/ROOT/distfiles
-zroot/ROOT/distfiles	/var/cache/distfiles	zfs	defaults,noauto		1 2 #fstab
-
+NULL
 
 ###boot pool###
 
